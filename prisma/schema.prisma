@@ -10,53 +10,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model users {
   id       Int    @id @default(autoincrement())
   email    String @unique
   password String
 }
 
-model Categories {
+model categories {
   id   Int     @id @default(autoincrement())
   name String  @unique
-  tests Tests[]
+  tests tests[]
 }
 
-model Teachers {
+model teachers {
   id                Int                   @id @default(autoincrement())
   name              String                @unique
-  teacherDiscipline TeachersDisciplines[]
+  teacherDiscipline teachersDisciplines[]
 }
 
-model Terms {
+model terms {
   id         Int           @id @default(autoincrement())
   number     Int           @unique
-  discipline Disciplines[]
+  discipline disciplines[]
 }
 
-model Disciplines {
+model disciplines {
   id                Int                   @id @default(autoincrement())
   name              String                @unique
   termId            Int
-  terms             Terms                 @relation(fields: [termId], references: [id])
-  teacherDiscipline TeachersDisciplines[]
+  terms             terms                 @relation(fields: [termId], references: [id])
+  teacherDiscipline teachersDisciplines[]
 }
 
-model TeachersDisciplines {
+model teachersDisciplines {
   id           Int         @id @default(autoincrement())
   teacherId    Int
   disciplineId Int
-  teachers     Teachers    @relation(fields: [teacherId], references: [id])
-  disciplines  Disciplines @relation(fields: [disciplineId], references: [id])
-  tests        Tests[]
+  teachers     teachers    @relation(fields: [teacherId], references: [id])
+  disciplines  disciplines @relation(fields: [disciplineId], references: [id])
+  tests        tests[]
 }
 
-model Tests {
+model tests {
   id                  Int                 @id @default(autoincrement())
   name                String
   pdfUrl              String
   categoryId          Int
   teacherDisciplineId Int
-  teacherDisciplines  TeachersDisciplines @relation(fields: [teacherDisciplineId], references: [id])
-  categories          Categories          @relation(fields: [categoryId], references: [id])
+  teacherDisciplines  teachersDisciplines @relation(fields: [teacherDisciplineId], references: [id])
+  categories          categories          @relation(fields: [categoryId], references: [id])
 }
