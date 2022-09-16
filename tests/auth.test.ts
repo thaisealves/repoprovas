@@ -11,7 +11,6 @@ describe("Testing /POST on signUp", () => {
   it("Must return 201 when the user has the right format", async () => {
     const user = newUser();
     const creating = await supertest(app).post("/signup").send(user);
-
     const userCreated = await prisma.users.findUnique({
       where: { email: user.email },
     });
