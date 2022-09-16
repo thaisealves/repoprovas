@@ -53,6 +53,16 @@ describe("Testing /POST on signIn", () => {
     const loggedIn = await supertest(app).post("/signin").send(loginUser);
     expect(loggedIn.status).toBe(401);
   });
+
+  it("Must return 404 when theres no user with that email", async () => {
+    const { email, password } = newUser();
+    const loginUser = {
+      email,
+      password,
+    };
+    const loggedIn = await supertest(app).post("/signin").send(loginUser);
+    expect(loggedIn.status).toBe(404);
+  });
 });
 
 afterAll(async () => {
