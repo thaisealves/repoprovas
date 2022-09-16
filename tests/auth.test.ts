@@ -2,7 +2,7 @@ import newUser from "./factories/userFactory";
 import supertest from "supertest";
 import app from "../src/index";
 import { prisma } from "../src/utils/database";
-
+import { faker } from "@faker-js/faker";
 beforeEach(async () => {
   await prisma.$executeRaw`TRUNCATE TABLE "users"`;
 });
@@ -42,7 +42,19 @@ describe("Testing /POST on signIn", () => {
     expect(loggedIn.body).toBeInstanceOf(Object);
     expect(loggedIn.body).toHaveProperty("token");
   });
+
+  it("Must return 401 when the password is incorrect", async () => {
+    const user = newUser();
+    const loginUser = {
+      email: user.email,
+      password: faker.internet.password(),
+    };
+    await supertest(app).post("/signup").send(user);
+    const loggedIn = await supertest(app).post("/signin").send(loginUser);
+    expect(loggedIn.status).toBe(401);
+  });
 });
+
 afterAll(async () => {
   await prisma.$disconnect();
 });
