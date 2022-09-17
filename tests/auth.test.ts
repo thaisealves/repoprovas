@@ -26,6 +26,14 @@ describe("Testing /POST on signUp", () => {
 
     expect(creating.status).toBe(409);
   });
+  it("Must return 422 with the wrong body", async () => {
+    const wrongSignUp = {
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    };
+    const signUp = await supertest(app).post("/signup").send(wrongSignUp);
+    expect(signUp.status).toBe(422);
+  });
 });
 
 describe("Testing /POST on signIn", () => {
@@ -61,6 +69,16 @@ describe("Testing /POST on signIn", () => {
     };
     const loggedIn = await supertest(app).post("/signin").send(loginUser);
     expect(loggedIn.status).toBe(404);
+  });
+
+  it("Must return 422 with the wrong body", async () => {
+    const user = newUser();
+    const loginUser = {
+      email: user.email,
+    };
+    await supertest(app).post("/signup").send(user);
+    const loggedIn = await supertest(app).post("/signin").send(loginUser);
+    expect(loggedIn.status).toBe(422);
   });
 });
 
