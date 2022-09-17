@@ -7,7 +7,5 @@ export default function newExam() {
     categoryId: faker.datatype.number({ min: 1, max: 3 }),
     disciplineId: 1,
     teacherId: 1,
-
-    // faker.datatype.number({ min: 1, max: 3 })
   };
 }

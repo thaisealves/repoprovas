@@ -32,3 +32,43 @@ export async function seeExistence(
   });
   return { teacher, discipline, category };
 }
+
+export async function getByDisciplineRepository() {
+  const allExams = await prisma.terms.findMany({
+    select: {
+      number: true,
+      discipline: {
+        select: {
+          name: true,
+          teacherDiscipline: {
+            select: {
+              tests: {
+                distinct: ["categoryId"],
+                select: {
+                  categories: {
+                    select: {
+                      id: true,
+                      name: true,
+                      tests: {
+                        select: {
+                          id: true,
+                          name: true,
+                          pdfUrl: true,
+                          teacherDisciplines: {
+                            select: { teachers: { select: { name: true } } },
+                          },
+                        },
+                        orderBy: [{ categories: { name: "desc" } }],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return allExams;
+}

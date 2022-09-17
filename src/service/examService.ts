@@ -1,12 +1,12 @@
 import {
   createExam,
+  getByDisciplineRepository,
   seeExistence,
   teacherDisciplineRelation,
 } from "../repositories/examRepository";
 import { CreateExam, ReceivingExam } from "../types/examTypes";
 
 export async function createExamService(newExam: ReceivingExam) {
-    
   await gettingExistence(
     newExam.teacherId,
     newExam.categoryId,
@@ -26,8 +26,13 @@ export async function createExamService(newExam: ReceivingExam) {
   await createExam(formatedExam);
 }
 
+export async function getByDisciplineService() {
+  const allExams = await getByDisciplineRepository();
 
+  return allExams;
+}
 
+//function to validate on creating an exam
 async function getRelation(teacherId: number, disciplineId: number) {
   const teacherDiscipline = await teacherDisciplineRelation(
     teacherId,
