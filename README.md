@@ -189,7 +189,3 @@ All the information from the exams, ordered by teacher
   ]
 }
 ```
-
-## Access the API on the deploy URL:
-
-`https://api-repo-provass.herokuapp.com/`
