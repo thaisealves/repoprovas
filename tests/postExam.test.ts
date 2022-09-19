@@ -5,6 +5,7 @@ import newExam from "./factories/examFactory";
 import newUser from "./factories/userFactory";
 beforeEach(async () => {
   await prisma.$executeRaw`TRUNCATE TABLE "tests"`;
+  await prisma.$executeRaw`TRUNCATE TABLE "users"`;
 });
 
 describe("Testing /POST on exam", () => {
@@ -23,8 +24,7 @@ describe("Testing /POST on exam", () => {
       .post("/exam")
       .send(exam)
       .set({ Authorization: `Bearer ${getToken.body.token}` });
-
-    console.log(creatingExam.error);
+  
     const createdExam = await prisma.tests.findFirst({
       where: {
         pdfUrl: exam.pdf,
@@ -37,7 +37,6 @@ describe("Testing /POST on exam", () => {
   it("Must return 401 without authorization", async () => {
     const exam = newExam();
     const creatingExam = await supertest(app).post("/exam").send(exam);
-    console.log(creatingExam.error);
     expect(creatingExam.status).toBe(401);
   });
 

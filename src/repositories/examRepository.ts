@@ -34,19 +34,6 @@ export async function seeExistence(
 }
 
 export async function getByDisciplineRepository() {
-  // const allExams = await prisma.$queryRaw`SELECT terms.id, terms.number AS "termNumber",
-  // json_agg(json_build_object(	categories.name,json_build_object( 'teachersName',teachers.name,'disciplineName',disciplines.name,
-  //                'disciplineId',disciplines.id,'testName',tests.name,
-  //                'pdfUrl',tests."pdfUrl"))) as tests
-  // FROM terms
-  // JOIN disciplines ON terms.id = disciplines."termId"
-  // JOIN "teachersDisciplines" ON "teachersDisciplines"."disciplineId" = disciplines.id
-  // JOIN teachers ON "teachersDisciplines"."teacherId" = teachers.id
-  // JOIN tests ON "teachersDisciplines".id = tests."teacherDisciplineId"
-  // JOIN categories ON categories.id = tests."categoryId"
-  // GROUP BY terms.id`
-
-  //trying to do without SQL query
   const allExams = await prisma.terms.findMany({
     select: {
       id: true,
