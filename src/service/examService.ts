@@ -29,7 +29,36 @@ export async function createExamService(newExam: ReceivingExam) {
 export async function getByDisciplineService() {
   const allExams = await getByDisciplineRepository();
 
-  return allExams;
+  const formatedData = allExams.map((el) => {
+    return {
+      termId: el.id,
+      termNumber: el.number,
+      discipline: el.discipline.map((discipline) => {
+        return {
+          disciplineId: discipline.id,
+          disciplineName: discipline.name,
+          categories: discipline.teacherDiscipline[0].tests.map((category) => {
+            return {
+              categoryId: category.categories.id,
+              categoryName: category.categories.name,
+              tests: category.categories.tests.map((test) => {
+                if (test.teacherDisciplines.disciplineId === discipline.id) {
+                  return {
+                    testId: test.id,
+                    testName: test.name,
+                    testPdf: test.pdfUrl,
+                    teacherName: test.teacherDisciplines.teachers.name,
+                    teacherId: test.teacherDisciplines.teachers.id,
+                  };
+                }
+              }).filter(notNull=> notNull),
+            };
+          }),
+        };
+      }),
+    };
+  });
+  return formatedData;
 }
 
 //function to validate on creating an exam
