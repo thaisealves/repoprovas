@@ -34,7 +34,7 @@ export async function getByDisciplineService() {
     return {
       termId: el.id,
       termNumber: el.number,
-      discipline: el.discipline.map((discipline) => {
+      discipline: el.disciplines.map((discipline) => {
         return {
           disciplineId: discipline.id,
           disciplineName: discipline.name,
@@ -67,7 +67,6 @@ export async function getByDisciplineService() {
 export async function getByTeacherService() {
   const allExams = await getByTeacherRepository();
   const formatedByTeacher = allExams.map((each) => {
-
     return {
       teacherId: each.id,
       teacherName: each.name,
@@ -77,14 +76,19 @@ export async function getByTeacherService() {
             return {
               categoryId: category.categories.id,
               categoryName: category.categories.name,
-              tests: category.categories.tests.map((test) => {
-                return {
-                  testId: test.id,
-                  testName: test.name,
-                  disciplineId: test.teacherDisciplines.disciplines.id,
-                  disciplineName: test.teacherDisciplines.disciplines.name,
-                };
-              }),
+              tests: category.categories.tests
+                .map((test) => {
+                  if (
+                    test.teacherDisciplines.disciplines.id === el.disciplineId
+                  )
+                    return {
+                      testId: test.id,
+                      testName: test.name,
+                      disciplineId: test.teacherDisciplines.disciplines.id,
+                      disciplineName: test.teacherDisciplines.disciplines.name,
+                    };
+                })
+                .filter((notNull) => notNull),
             };
           }),
         };

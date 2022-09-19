@@ -38,7 +38,7 @@ export async function getByDisciplineRepository() {
     select: {
       id: true,
       number: true,
-      discipline: {
+      disciplines: {
         select: {
           id: true,
           name: true,
@@ -84,11 +84,11 @@ export async function getByTeacherRepository() {
       name: true,
       teacherDiscipline: {
         select: {
+          disciplineId: true,
           tests: {
             distinct: ["categoryId"],
             select: {
               categories: {
-                
                 select: {
                   id: true,
                   name: true,
