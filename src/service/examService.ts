@@ -70,29 +70,35 @@ export async function getByTeacherService() {
     return {
       teacherId: each.id,
       teacherName: each.name,
-      categories: each.teacherDiscipline.map((el) => {
-        return {
-          category: el.tests.map((category) => {
+      categories: each.teacherDiscipline
+        .map((el) => {
+          if (el.tests.length !== 0) {
             return {
-              categoryId: category.categories.id,
-              categoryName: category.categories.name,
-              tests: category.categories.tests
-                .map((test) => {
-                  if (
-                    test.teacherDisciplines.disciplines.id === el.disciplineId
-                  )
-                    return {
-                      testId: test.id,
-                      testName: test.name,
-                      disciplineId: test.teacherDisciplines.disciplines.id,
-                      disciplineName: test.teacherDisciplines.disciplines.name,
-                    };
-                })
-                .filter((notNull) => notNull),
+              category: el.tests.map((category) => {
+                return {
+                  categoryId: category.categories.id,
+                  categoryName: category.categories.name,
+                  tests: category.categories.tests
+                    .map((test) => {
+                      if (
+                        test.teacherDisciplines.disciplines.id ===
+                        el.disciplineId
+                      )
+                        return {
+                          testId: test.id,
+                          testName: test.name,
+                          disciplineId: test.teacherDisciplines.disciplines.id,
+                          disciplineName:
+                            test.teacherDisciplines.disciplines.name,
+                        };
+                    })
+                    .filter((notNull) => notNull),
+                };
+              }),
             };
-          }),
-        };
-      }),
+          }
+        })
+        .filter((notNull) => notNull),
     };
   });
   return formatedByTeacher;
