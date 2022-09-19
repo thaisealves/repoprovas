@@ -1,7 +1,9 @@
 import supertest from "supertest";
 import app from "../src/index";
 import { prisma } from "../src/utils/database";
+import { createExamFactory } from "./factories/createExamFactory";
 import newExam from "./factories/examFactory";
+import { tokenFactory } from "./factories/tokenFactory";
 import newUser from "./factories/userFactory";
 beforeEach(async () => {
   await prisma.$executeRaw`TRUNCATE TABLE "tests"`;
@@ -10,21 +12,12 @@ beforeEach(async () => {
 
 describe("Testing /POST on exam", () => {
   it("Must return 201 with right body, with authorization", async () => {
-    const user = newUser();
     const exam = newExam();
 
-    const loginUser = {
-      email: user.email,
-      password: user.password,
-    };
-    await supertest(app).post("/signup").send(user);
-    const getToken = await supertest(app).post("/signin").send(loginUser);
+    const getToken = await tokenFactory();
 
-    const creatingExam = await supertest(app)
-      .post("/exam")
-      .send(exam)
-      .set({ Authorization: `Bearer ${getToken.body.token}` });
-  
+    const creatingExam = await createExamFactory(getToken.body.token);
+
     const createdExam = await prisma.tests.findFirst({
       where: {
         pdfUrl: exam.pdf,
@@ -41,13 +34,7 @@ describe("Testing /POST on exam", () => {
   });
 
   it("Must return 404 if teacher, category or discipline doesn't exists", async () => {
-    const user = newUser();
     const exam = newExam();
-
-    const loginUser = {
-      email: user.email,
-      password: user.password,
-    };
 
     const teachers = await prisma.teachers.findMany();
     const categories = await prisma.categories.findMany();
@@ -62,8 +49,7 @@ describe("Testing /POST on exam", () => {
       teacherId: wrongTeacherId,
       disciplineId: wrongDisciplineId,
     };
-    await supertest(app).post("/signup").send(user);
-    const getToken = await supertest(app).post("/signin").send(loginUser);
+    const getToken = await tokenFactory();
 
     const creatingExam = await supertest(app)
       .post("/exam")
@@ -81,21 +67,15 @@ describe("Testing /POST on exam", () => {
 
   it("Must return 404 if relation between teacher and discipline doesn't exists", async () => {
     const relation = await prisma.teachersDisciplines.findMany();
-    const user = newUser();
     const exam = newExam();
 
-    const loginUser = {
-      email: user.email,
-      password: user.password,
-    };
     const wrongExam = {
       ...exam,
       teacherId: relation[0].teacherId + 1,
       disciplineId: relation[0].disciplineId,
     };
 
-    await supertest(app).post("/signup").send(user);
-    const getToken = await supertest(app).post("/signin").send(loginUser);
+    const getToken = await tokenFactory();
 
     const creatingExam = await supertest(app)
       .post("/exam")
@@ -112,20 +92,14 @@ describe("Testing /POST on exam", () => {
   });
 
   it("Must return 422 with the wrong body", async () => {
-    const user = newUser();
     const exam = newExam();
 
-    const loginUser = {
-      email: user.email,
-      password: user.password,
-    };
     const wrongExam = {
       teacherId: 1,
       disciplineId: 1,
     };
 
-    await supertest(app).post("/signup").send(user);
-    const getToken = await supertest(app).post("/signin").send(loginUser);
+    const getToken = await tokenFactory()
 
     const creatingExam = await supertest(app)
       .post("/exam")
