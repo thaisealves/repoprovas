@@ -7,5 +7,4 @@ const router = Router();
 router.use(authRoutes);
 router.use(validateToken);
 router.use(examRoutes);
-
 export default router;

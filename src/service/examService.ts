@@ -6,6 +6,13 @@ import {
   teacherDisciplineRelation,
 } from "../repositories/examRepository";
 import { CreateExam, ReceivingExam } from "../types/examTypes";
+import sgMail from "@sendgrid/mail";
+import {
+  getCategoryById,
+  getDisciplineById,
+  getTeacherById,
+  getUsersEmail,
+} from "../repositories/emailRepository";
 
 export async function createExamService(newExam: ReceivingExam) {
   await gettingExistence(
@@ -25,6 +32,28 @@ export async function createExamService(newExam: ReceivingExam) {
     teacherDisciplineId,
   };
   await createExam(formatedExam);
+}
+
+export async function sendEmail(newExam: ReceivingExam) {
+  const allEmails = await getUsersEmail();
+  const teacher = await getTeacherById(newExam.teacherId);
+  console.log(teacher);
+  const discipline = await getDisciplineById(newExam.disciplineId);
+  const category = await getCategoryById(newExam.categoryId);
+  sgMail.setApiKey(String(process.env.SENDGRID_API_KEY));
+  const msg = {
+    to: allEmails,
+    from: "alves.thaisesilva@gmail.com",
+    subject: "Prova adicionada",
+    text: `A seguinte prova foi adicionada: ${teacher?.name} ${category?.name} ${newExam.name} (${discipline?.name})`,
+    html: `A seguinte prova foi adicionada: ${teacher?.name} ${category?.name} ${newExam.name} (${discipline?.name})`,
+  };
+
+  const sended = await sgMail.send(msg);
+
+  if (!sended) {
+    throw { code: "Unauthorized", message: "Not possible to post email" };
+  }
 }
 
 export async function getByDisciplineService() {
