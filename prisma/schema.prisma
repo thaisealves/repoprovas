@@ -17,9 +17,9 @@ model users {
 }
 
 model categories {
-  id          Int           @id @default(autoincrement())
-  name        String        @unique
-  tests       tests[]
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  tests tests[]
 }
 
 model disciplines {
@@ -37,8 +37,8 @@ model teachers {
 }
 
 model terms {
-  id         Int           @id @default(autoincrement())
-  number     Int           @unique
+  id          Int           @id @default(autoincrement())
+  number      Int           @unique
   disciplines disciplines[]
 }
 
@@ -49,6 +49,8 @@ model teachersDisciplines {
   teachers     teachers    @relation(fields: [teacherId], references: [id])
   disciplines  disciplines @relation(fields: [disciplineId], references: [id])
   tests        tests[]
+
+  @@unique([teacherId, disciplineId])
 }
 
 model tests {
