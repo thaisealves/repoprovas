@@ -1,6 +1,7 @@
 import {
   createExam,
   getByDisciplineRepository,
+  getByTeacherRepository,
   seeExistence,
   teacherDisciplineRelation,
 } from "../repositories/examRepository";
@@ -29,7 +30,7 @@ export async function createExamService(newExam: ReceivingExam) {
 export async function getByDisciplineService() {
   const allExams = await getByDisciplineRepository();
 
-  const formatedData = allExams.map((el) => {
+  const formatedByDiscipline = allExams.map((el) => {
     return {
       termId: el.id,
       termNumber: el.number,
@@ -41,24 +42,56 @@ export async function getByDisciplineService() {
             return {
               categoryId: category.categories.id,
               categoryName: category.categories.name,
-              tests: category.categories.tests.map((test) => {
-                if (test.teacherDisciplines.disciplineId === discipline.id) {
-                  return {
-                    testId: test.id,
-                    testName: test.name,
-                    testPdf: test.pdfUrl,
-                    teacherName: test.teacherDisciplines.teachers.name,
-                    teacherId: test.teacherDisciplines.teachers.id,
-                  };
-                }
-              }).filter(notNull=> notNull),
+              tests: category.categories.tests
+                .map((test) => {
+                  if (test.teacherDisciplines.disciplineId === discipline.id) {
+                    return {
+                      testId: test.id,
+                      testName: test.name,
+                      testPdf: test.pdfUrl,
+                      teacherName: test.teacherDisciplines.teachers.name,
+                      teacherId: test.teacherDisciplines.teachers.id,
+                    };
+                  }
+                })
+                .filter((notNull) => notNull),
             };
           }),
         };
       }),
     };
   });
-  return formatedData;
+  return formatedByDiscipline;
+}
+
+export async function getByTeacherService() {
+  const allExams = await getByTeacherRepository();
+  const formatedByTeacher = allExams.map((each) => {
+
+    return {
+      teacherId: each.id,
+      teacherName: each.name,
+      categories: each.teacherDiscipline.map((el) => {
+        return {
+          category: el.tests.map((category) => {
+            return {
+              categoryId: category.categories.id,
+              categoryName: category.categories.name,
+              tests: category.categories.tests.map((test) => {
+                return {
+                  testId: test.id,
+                  testName: test.name,
+                  disciplineId: test.teacherDisciplines.disciplines.id,
+                  disciplineName: test.teacherDisciplines.disciplines.name,
+                };
+              }),
+            };
+          }),
+        };
+      }),
+    };
+  });
+  return formatedByTeacher;
 }
 
 //function to validate on creating an exam

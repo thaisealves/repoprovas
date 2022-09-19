@@ -76,3 +76,40 @@ export async function getByDisciplineRepository() {
   });
   return allExams;
 }
+
+export async function getByTeacherRepository() {
+  const allExams = await prisma.teachers.findMany({
+    select: {
+      id: true,
+      name: true,
+      teacherDiscipline: {
+        select: {
+          tests: {
+            distinct: ["categoryId"],
+            select: {
+              categories: {
+                
+                select: {
+                  id: true,
+                  name: true,
+                  tests: {
+                    select: {
+                      id: true,
+                      name: true,
+                      teacherDisciplines: {
+                        select: {
+                          disciplines: { select: { id: true, name: true } },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return allExams;
+}
